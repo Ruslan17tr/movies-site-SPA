@@ -1,6 +1,6 @@
 import MovieList from "../../components/MovielList/MovieList";
 import { useGenreMovies } from "../../hooks/useMovies"
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router";
 import { Loader } from "../../components/Loader/Loader";
 import {  useEffect } from 'react';
 

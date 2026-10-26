@@ -1,50 +1,65 @@
-import './index.css';
-import React, { useState } from 'react';
+import "./index.css";
+import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { registerProfile } from "../../api/User";
 import { queryClient } from "../../api/queryClient";
-import { CustomInput } from '../CustomInput/CustomInput';
-
+import { CustomInput } from "../CustomInput/CustomInput";
 
 interface RegisterFormProps {
   onSuccess?: () => void;
   onSwitchToConfirm?: () => void;
 }
 
-export const RegisterForm = ({ onSuccess, onSwitchToConfirm }: RegisterFormProps) => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+export const RegisterForm = ({
+  onSuccess,
+  onSwitchToConfirm,
+}: RegisterFormProps) => {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const registrationMutation = useMutation({
-    mutationFn: ({ email, password, name, surname }: { email: string, password: string, name: string, surname: string }) => registerProfile(email, password, name, surname),
-    onSuccess: (isSuccess) => {
-      if (isSuccess) {
-        setEmail('');
-        setName('');
-        setSurname('');
-        setPassword('');
-        setPasswordConfirm('');
-        onSuccess?.();
-      }
-      onSwitchToConfirm?.();    
+  const registrationMutation = useMutation(
+    {
+      mutationFn: ({
+        email,
+        password,
+        name,
+        surname,
+      }: {
+        email: string;
+        password: string;
+        name: string;
+        surname: string;
+      }) => registerProfile(email, password, name, surname),
+      onSuccess: (isSuccess) => {
+        if (isSuccess) {
+          setEmail("");
+          setName("");
+          setSurname("");
+          setPassword("");
+          setPasswordConfirm("");
+          onSuccess?.();
+          onSwitchToConfirm?.();
+        }
+      },
+      onError: (error: Error) => {
+        console.error("Ошибка регистрации:", error);
+        setErrorMessage(error.message || "Ошибка при регистрации");
+      },
     },
-  }, queryClient);
-
+    queryClient,
+  );
 
   const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    registrationMutation.mutate({ email, password, name, surname, });
-  }
+    setErrorMessage(null);
+    registrationMutation.mutate({ email, password, name, surname });
+  };
   const isFormValid =
-    email &&
-    name &&
-    surname &&
-    password &&
-    password === passwordConfirm;
-
+    email && name && surname && password && password === passwordConfirm;
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>
@@ -89,18 +104,25 @@ export const RegisterForm = ({ onSuccess, onSwitchToConfirm }: RegisterFormProps
         value={passwordConfirm}
       />
 
-      {registrationMutation.error && (
+      {errorMessage && <span className="register-error">{errorMessage}</span>}
+
+      {password && passwordConfirm && password !== passwordConfirm && (
+        <span className="register-error">Пароли не совпадают</span>
+      )}
+
+      {password && password.length < 6 && (
         <span className="register-error">
-          {registrationMutation.error.message}
+          Пароль должен быть не менее 6 символов
         </span>
       )}
 
-      {password && passwordConfirm && password !== passwordConfirm && (
-        <span className="register-error">
-          Пароли не совпадают
-        </span>
-      )}
-      <button className="register-submit" type="submit" disabled={registrationMutation.isPending || !isFormValid}>Создать аккаунт</button>
+      <button
+        className="register-submit"
+        type="submit"
+        disabled={registrationMutation.isPending || !isFormValid}
+      >
+        Создать аккаунт
+      </button>
     </form>
   );
 };

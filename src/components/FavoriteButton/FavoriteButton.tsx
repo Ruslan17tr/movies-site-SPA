@@ -1,13 +1,16 @@
-import './index.css';
-import { usePostFavorite, useDeleteFavorite, useIsFavorite } from '../../hooks/useFavorite';
-import { useProfile } from '../../hooks/useProfile';
-import { useState } from 'react';
-import { ModalWindow } from '../ModalWindow/ModalWindow';
+import "./index.css";
+import {
+  usePostFavorite,
+  useDeleteFavorite,
+  useIsFavorite,
+} from "../../hooks/useFavorite";
+import { useProfile } from "../../hooks/useProfile";
+import { useState } from "react";
+import { ModalWindow } from "../ModalWindow/ModalWindow";
 
 interface FavoriteButtonProps {
   id: number;
 }
-
 
 export const FavoriteButton = ({ id }: FavoriteButtonProps) => {
   const isFavorite = useIsFavorite(id);
@@ -33,15 +36,19 @@ export const FavoriteButton = ({ id }: FavoriteButtonProps) => {
 
   return (
     <div>
-      <button className={`btn btn-circle ${isFavorite ? 'like--active' : ''}`} aria-label="Добавить в избранное"
+      <button
+        className={`btn btn-circle ${isFavorite ? "like--active" : ""}`}
+        aria-label={`${isFavorite ? "Удалить из избранного" : "Добавить в избранное"}`}
         onClick={handleToggle}
-        disabled={isLoading}>
-        <svg width="24" height="24"  >
-          <use href={`${isFavorite ? '/sprite.svg#favorite-icon' : '/sprite.svg#like-icon'}`}></use>
+        disabled={isLoading}
+      >
+        <svg width="24" height="24">
+          <use
+            href={`${isFavorite ? "/sprite.svg#favorite-icon" : "/sprite.svg#like-icon"}`}
+          ></use>
         </svg>
       </button>
       <ModalWindow isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
-  )
-
-}
+  );
+};

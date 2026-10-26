@@ -16,6 +16,6 @@ import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <App /> {/* App уже содержит BrowserRouter */}
+        <App /> 
     </React.StrictMode>
 );

@@ -1,9 +1,10 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchProfile, logoutProfile } from '../api/User';
 import { queryClient } from '../api/queryClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export const useProfile = () => {
+  
   return useQuery({
     queryFn: fetchProfile,
     queryKey: ['users', 'me'],
@@ -11,7 +12,6 @@ export const useProfile = () => {
     staleTime: 5 * 60 * 1000,
   }, queryClient);
 };
-
 
 
 export const useLogout = () => {

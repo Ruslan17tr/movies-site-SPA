@@ -1,45 +1,70 @@
-import { useState } from 'react';
-import React from 'react';
-import type { FC } from 'react';
+import { useState } from "react";
+import React from "react";
+import type { FC } from "react";
 import "./index.css";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from '../../api/queryClient';
-import { loginProfile } from '../../api/User';
-import { CustomInput } from '../CustomInput/CustomInput';
-import { LoaderSecond } from '../Loader/Loader';
-
+import { queryClient } from "../../api/queryClient";
+import { loginProfile } from "../../api/User";
+import { CustomInput } from "../CustomInput/CustomInput";
+import { LoaderSecond } from "../Loader/Loader";
 
 interface LoginFormProps {
   onSuccess?: () => void;
 }
 
-
 export const LoginForm: FC<LoginFormProps> = ({ onSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loginMutation = useMutation(
     {
-      mutationFn: ({ email, password }: { email: string; password: string }) => loginProfile(email, password),
+      mutationFn: ({ email, password }: { email: string; password: string }) =>
+        loginProfile(email, password),
       onSuccess: (isSuccess) => {
         if (isSuccess) {
-          queryClient.invalidateQueries({ queryKey: ['users', 'me'] });
+          queryClient.invalidateQueries({ queryKey: ["users", "me"] });
           onSuccess?.();
         }
       },
-    }, queryClient);
-
-  
+      onError: (error: Error) => {
+        console.error("Ошибка входа:", error);
+        setErrorMessage(error.message || "Ошибка при входе");
+      },
+    },
+    queryClient,
+  );
 
   const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    setErrorMessage(null);
     loginMutation.mutate({ email, password });
+  };
+
+  if (loginMutation.isError && errorMessage) {
+    return (
+      <div className="login-form">
+        <p className="login-form__error">{errorMessage}</p>
+        <button
+          className="login-button"
+          onClick={() => {
+            loginMutation.reset();
+            setErrorMessage(null);
+            setPassword("");
+          }}
+        >
+          Попробовать снова
+        </button>
+      </div>
+    );
   }
 
-  if(loginMutation.isPending) {
-    return <div className="login-form">
-      <LoaderSecond />
+  if (loginMutation.isPending) {
+    return (
+      <div className="login-form">
+        <LoaderSecond />
       </div>
+    );
   }
 
   return (
@@ -52,7 +77,7 @@ export const LoginForm: FC<LoginFormProps> = ({ onSuccess }) => {
         placeholder="Электронная почта"
         required
         isLoading={loginMutation.isPending}
-        error={loginMutation.error ? 'Неверный email или пароль' : undefined}
+        error={loginMutation.error ? "Неверный email или пароль" : undefined}
       />
 
       <CustomInput
@@ -64,10 +89,13 @@ export const LoginForm: FC<LoginFormProps> = ({ onSuccess }) => {
         required
         isLoading={loginMutation.isPending}
       />
-      <button className='login-button' type='submit' disabled={loginMutation.isPending || !email || !password}>Войти</button>
-      
+      <button
+        className="login-button"
+        type="submit"
+        disabled={loginMutation.isPending || !email || !password}
+      >
+        Войти
+      </button>
     </form>
-    
-
   );
-}
+};

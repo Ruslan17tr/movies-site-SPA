@@ -29,4 +29,4 @@ export interface IMovie {
 
 
 export type Movie = IMovie; 
-export type MovieList = [IMovie]; 
+export type MovieList = IMovie[]; 

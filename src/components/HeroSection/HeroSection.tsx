@@ -1,6 +1,6 @@
 import './index.css';
 import type { IMovie } from '../../models/movies';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { FavoriteButton } from '../FavoriteButton/FavoriteButton'
 import { genreNames } from "../../components/GanreCard/GenreCard"
 

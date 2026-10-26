@@ -8,8 +8,8 @@ export async function loginProfile(email: string, password: string): Promise<boo
       { withCredentials: true }
     )
     return response.data.result
-  } catch {
-    return false
+  } catch (error) {
+    throw new Error('Неверный email или пароль');
   }
 }
 
@@ -26,8 +26,8 @@ export async function registerProfile(email: string, password: string, name: str
       { email, password, name, surname }
     )
     return response.data.result;
-  } catch {
-    return false
+  } catch (error) {
+    throw new Error('Ошибка регистрации. Попробуйте еще раз.');
   }
 }
 
@@ -38,6 +38,7 @@ export async function fetchProfile(): Promise<IProfile | null> {
     )
     return response.data
   }
+
   catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       return null 
